@@ -1,42 +1,58 @@
-#pragma once
+#ifndef ORDER_H_
+#define ORDER_H_
 
+#pragma once
 #include <string>
 #include <vector>
-using std::string;
-using std::vector;
+
+/* ============================
+          Enums & Macros
+============================ */
 
 enum class OrderStatus {
     PENDING,
     COLLECTING,
     DELIVERING,
-    COMPLETED,
+    COMPLETED
 };
 
 #define NO_VOLUNTEER -1
 
+/* ============================
+             Order
+============================ */
+
 class Order {
+public:
+    Order(int id, int customerId, int distance);
 
-    public:
-        Order(int id, int customerId, int distance);
-        int getId() const;
-        int getCustomerId() const;
-        void setStatus(OrderStatus status);
-        void setCollectorId(int collectorId);
-        void setDriverId(int driverId);
-        int getCollectorId() const;
-        int getDriverId() const;
-        OrderStatus getStatus() const;
-        const string toString() const;
-        int getDistance() const;/// I ADD
-        const string fromOrderToString(OrderStatus status) const ;
-         virtual ~Order()=default;
-        
+    // Getters
+    int getId() const;
+    int getCustomerId() const;
+    int getCollectorId() const;
+    int getDriverId() const;
+    int getDistance() const;
+    OrderStatus getStatus() const;
 
-    private:
-        const int id;
-        const int customerId;
-        const int distance;
-        OrderStatus status;
-        int collectorId; //Initialized to NO_VOLUNTEER if no collector has been assigned yet
-        int driverId; //Initialized to NO_VOLUNTEER if no driver has been assigned yet
+    // Setters
+    void setStatus(OrderStatus status);
+    void setCollectorId(int collectorId);
+    void setDriverId(int driverId);
+
+    // Helpers
+    const std::string toString() const;
+    const std::string fromOrderToString(OrderStatus status) const;
+
+    virtual ~Order() = default;
+
+private:
+    const int id;
+    const int customerId;
+    const int distance;
+    OrderStatus status;
+
+    int collectorId; // Initialized to NO_VOLUNTEER if none assigned
+    int driverId;    // Initialized to NO_VOLUNTEER if none assigned
 };
+
+#endif // ORDER_H_
