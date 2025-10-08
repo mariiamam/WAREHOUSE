@@ -1,160 +1,192 @@
 #ifndef ACTION_H_
 #define ACTION_H_
-#pragma once
+
 #include <string>
 #include <vector>
-#include "Volunteer.h"
-#include <WareHouse.h>
-using std::string;
-using std::vector;
 
+// Forward declarations (avoid heavy includes in headers)
+class WareHouse;
+class Volunteer;
+
+// Global backup pointer (defined in main.cpp)
 extern WareHouse* backup;
 
+/* ============================
+          Enums
+============================ */
 
+enum class ActionStatus { COMPLETED, ERROR };
+enum class CustomerType { Soldier, Civilian };
 
-enum class ActionStatus{
-    COMPLETED, ERROR
+/* ============================
+        BaseAction
+============================ */
+
+class BaseAction {
+public:
+    BaseAction();
+    virtual ~BaseAction() = default;
+
+    ActionStatus getStatus() const;
+
+    virtual void act(WareHouse& wareHouse) = 0;
+    virtual std::string toString() const = 0;
+    virtual BaseAction* clone() const = 0;
+
+protected:
+    void complete();
+    void error(std::string errorMsg);
+    std::string getErrorMsg() const;
+    std::string statusToString(ActionStatus status) const;
+
+private:
+    std::string  errorMsg;
+    ActionStatus status;
 };
 
-enum class CustomerType{
-    Soldier, Civilian
-};
-
-
-class BaseAction{
-    public:
-        BaseAction();
-        ActionStatus getStatus() const;
-        virtual void act(WareHouse& wareHouse)=0;
-        virtual string toString() const=0;
-        virtual BaseAction* clone() const=0;
-         virtual ~BaseAction()=default;
-
-       
-
-    protected:
-        void complete();
-        void error(string errorMsg);
-        string getErrorMsg() const;
-        string statusToString(ActionStatus status) const ;
-     
-            
-
-
-    private:
-        string errorMsg;
-        ActionStatus status;
-};
+/* ============================
+        SimulateStep
+============================ */
 
 class SimulateStep : public BaseAction {
+public:
+    explicit SimulateStep(int numOfSteps);
+    void act(WareHouse& wareHouse) override;
+    std::string toString() const override;
+    SimulateStep* clone() const override;
 
-    public:
-        SimulateStep(int numOfSteps);
-        void act(WareHouse &wareHouse) override;
-        std::string toString() const override;
-        SimulateStep *clone() const override;
-
-    private:
-        const int numOfSteps;
+private:
+    const int numOfSteps;
 };
+
+/* ============================
+          AddOrder
+============================ */
 
 class AddOrder : public BaseAction {
-    public:
-        AddOrder(int id);
-        void act(WareHouse &wareHouse) override;
-        string toString() const override;
-        AddOrder *clone() const override;
-    private:
-        const int customerId;
+public:
+    explicit AddOrder(int id);
+    void act(WareHouse& wareHouse) override;
+    std::string toString() const override;
+    AddOrder* clone() const override;
+
+private:
+    const int customerId;
 };
 
+/* ============================
+         AddCustomer
+============================ */
 
 class AddCustomer : public BaseAction {
-    public:
-        AddCustomer(string customerName, string customerType, int distance, int maxOrders);
-        void act(WareHouse &wareHouse) override;
-        AddCustomer *clone() const override;
-        string toString() const override;
-        const CustomerType stringToCustomerType ( string CustomerType) const;
-    private:
-        const string customerName;
-        const CustomerType customerType;
-        const int distance;
-        const int maxOrders;
+public:
+    AddCustomer(std::string customerName, std::string customerType,
+                int distance, int maxOrders);
+
+    void act(WareHouse& wareHouse) override;
+    AddCustomer* clone() const override;
+    std::string toString() const override;
+
+    const CustomerType stringToCustomerType(std::string customerType) const;
+
+private:
+    const std::string  customerName;
+    const CustomerType customerType;
+    const int          distance;
+    const int          maxOrders;
 };
 
-         
-
-
+/* ============================
+       PrintOrderStatus
+============================ */
 
 class PrintOrderStatus : public BaseAction {
-    public:
-        PrintOrderStatus(int id);
-        void act(WareHouse &wareHouse) override;
-        PrintOrderStatus *clone() const override;
-        string toString() const override;
-    private:
-        const int orderId;
-        
+public:
+    explicit PrintOrderStatus(int id);
+    void act(WareHouse& wareHouse) override;
+    PrintOrderStatus* clone() const override;
+    std::string toString() const override;
+
+private:
+    const int orderId;
 };
 
-class PrintCustomerStatus: public BaseAction {
-    public:
-        PrintCustomerStatus(int customerId);
-        void act(WareHouse &wareHouse) override;
-        PrintCustomerStatus *clone() const override;
-        string toString() const override;
-    private:
-        const int customerId;
+/* ============================
+     PrintCustomerStatus
+============================ */
+
+class PrintCustomerStatus : public BaseAction {
+public:
+    explicit PrintCustomerStatus(int customerId);
+    void act(WareHouse& wareHouse) override;
+    PrintCustomerStatus* clone() const override;
+    std::string toString() const override;
+
+private:
+    const int customerId;
 };
 
+/* ============================
+     PrintVolunteerStatus
+============================ */
 
 class PrintVolunteerStatus : public BaseAction {
-    public:
-        PrintVolunteerStatus(int id);
-        void act(WareHouse &wareHouse) override;
-        PrintVolunteerStatus *clone() const override;
-        string toString() const override;
-    private:
-        const int volunteerId;
+public:
+    explicit PrintVolunteerStatus(int id);
+    void act(WareHouse& wareHouse) override;
+    PrintVolunteerStatus* clone() const override;
+    std::string toString() const override;
+
+private:
+    const int volunteerId;
 };
 
+/* ============================
+       PrintActionsLog
+============================ */
 
 class PrintActionsLog : public BaseAction {
-    public:
-        PrintActionsLog();
-        void act(WareHouse &wareHouse) override;
-        PrintActionsLog *clone() const override;
-        string toString() const override;
-    private:
+public:
+    PrintActionsLog();
+    void act(WareHouse& wareHouse) override;
+    PrintActionsLog* clone() const override;
+    std::string toString() const override;
 };
+
+/* ============================
+            Close
+============================ */
 
 class Close : public BaseAction {
-    public:
-        Close();
-        void act(WareHouse &wareHouse) override;
-        Close *clone() const override;
-        string toString() const override;
-    private:
+public:
+    Close();
+    void act(WareHouse& wareHouse) override;
+    Close* clone() const override;
+    std::string toString() const override;
 };
+
+/* ============================
+       BackupWareHouse
+============================ */
 
 class BackupWareHouse : public BaseAction {
-    public:
-        BackupWareHouse();
-        void act(WareHouse &wareHouse) override;
-        BackupWareHouse *clone() const override;
-        string toString() const override;
-    private:
+public:
+    BackupWareHouse();
+    void act(WareHouse& wareHouse) override;
+    BackupWareHouse* clone() const override;
+    std::string toString() const override;
 };
 
+/* ============================
+       RestoreWareHouse
+============================ */
 
 class RestoreWareHouse : public BaseAction {
-    public:
-        RestoreWareHouse();
-        void act(WareHouse &wareHouse) override;
-        RestoreWareHouse *clone() const override;
-        string toString() const override;
-    private:
+public:
+    RestoreWareHouse();
+    void act(WareHouse& wareHouse) override;
+    RestoreWareHouse* clone() const override;
+    std::string toString() const override;
 };
 
-#endif
+#endif // ACTION_H_
