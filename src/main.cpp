@@ -1,27 +1,27 @@
-//#include "WareHouse.h"
 #include <iostream>
+#include <string>
 #include "WareHouse.h"
-using namespace std;
 
-WareHouse* backup ;
+// Define the global backup pointer used by Backup/Restore actions.
+WareHouse* backup = nullptr;
 
-
-
-int main(int argc, char** argv){
-    if(argc!=2){
-        std::cout << "usage: warehouse </home/spl211/Downloads/configFileExample>" << std::endl;
-        return 0;
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        std::cerr << "Usage: warehouse <config_file_path>\n";
+        return 1;
     }
-    string configurationFile = argv[1];
+
+    const std::string configurationFile = argv[1];
+
+    // Create and run the warehouse simulation.
     WareHouse wareHouse(configurationFile);
     wareHouse.start();
-    if(backup!=nullptr){
-    	delete backup;
-    	backup = nullptr;
+
+    // Clean up global backup (if created during runtime).
+    if (backup != nullptr) {
+        delete backup;
+        backup = nullptr;
     }
-    
-    CivilianCustomer r(1,"j",2,3);
-    cout <<r.getId() << endl;
+
     return 0;
-    
 }
